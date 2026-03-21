@@ -194,6 +194,8 @@ export default function InterviewSimulator({ resumeText }: InterviewSimulatorPro
 
       <ProgressBar now={progress} className="mb-5 bg-dark" style={{ height: '4px' }} variant="primary" />
 
+      {error && <Alert variant="danger" className="mb-4 text-start">{error}</Alert>}
+
       <div className="chat-container d-flex flex-column gap-4 mb-5">
         {/* AI Question Bubble */}
         <div className="d-flex align-items-start max-w-75">
