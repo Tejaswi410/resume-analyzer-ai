@@ -16,12 +16,12 @@ export async function POST(req: NextRequest) {
     });
 
     const systemPrompt = `You are a strict, expert technical and behavioral interviewer. I will provide you with a candidate's resume.
-Your task is to generate EXACTLY 5 highly personalized interview questions based explicitly on the candidate's claims in their resume.
+Your task is to generate EXACTLY 10 highly personalized interview questions based explicitly on the candidate's claims in their resume.
 
 Include:
-- 2 Deep-Dive Experience Questions (e.g., "You mentioned reducing latency by 40% using Redis. Can you walk me through that specific architectural change?")
-- 1 Technical or Domain Skill Question based on a listed hard skill.
-- 2 Behavioral Questions tailored to their apparent seniority.
+- 4 Deep-Dive Experience Questions (e.g., "You mentioned reducing latency by 40% using Redis. Can you walk me through that specific architectural change?")
+- 3 Technical or Domain Skill Questions based on listed hard skills.
+- 3 Behavioral Questions tailored to their apparent seniority.
 
 Output purely valid JSON without markdown formatting, matching EXACTLY:
 {
@@ -30,7 +30,12 @@ Output purely valid JSON without markdown formatting, matching EXACTLY:
     "Question 2 string",
     "Question 3 string",
     "Question 4 string",
-    "Question 5 string"
+    "Question 5 string",
+    "Question 6 string",
+    "Question 7 string",
+    "Question 8 string",
+    "Question 9 string",
+    "Question 10 string"
   ]
 }`;
 
