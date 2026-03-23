@@ -52,10 +52,9 @@ export default function InterviewSimulator({ resumeText }: InterviewSimulatorPro
     }
   };
 
-  // --- Text-to-Speech (TTS) ---
   const playAudio = (text: string) => {
     if ("speechSynthesis" in window) {
-      window.speechSynthesis.cancel(); // Stop any currently playing audio
+      window.speechSynthesis.cancel();
       const utterance = new SpeechSynthesisUtterance(text);
       window.speechSynthesis.speak(utterance);
     }
@@ -67,7 +66,6 @@ export default function InterviewSimulator({ resumeText }: InterviewSimulatorPro
     }
   }, [currentIndex, questions, evaluation]);
 
-  // --- Speech-to-Text (STT) Recording ---
   const startRecording = async () => {
     try {
       const stream = await navigator.mediaDevices.getUserMedia({ audio: true });
@@ -157,14 +155,21 @@ export default function InterviewSimulator({ resumeText }: InterviewSimulatorPro
 
   if (questions.length === 0) {
     return (
-      <div className="text-center py-5">
-        <h4 className="fw-bold mb-3">Ready to practice?</h4>
-        <p className="text-muted mb-4 mx-auto" style={{ maxWidth: '500px' }}>
-          We will analyze your resume and generate 5 highly specific technical and behavioral questions to simulate a real interview.
+      <div className="text-center py-5 glass-panel rounded-4 mt-4 shadow-lg p-5 border-opacity-25 fade-in">
+        <div className="d-inline-flex bg-primary bg-opacity-25 p-4 rounded-circle mb-4 shadow-lg">
+          <svg width="48" height="48" viewBox="0 0 24 24" fill="none" stroke="var(--accent-blue)" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"><path d="M12 2a3 3 0 0 0-3 3v7a3 3 0 0 0 6 0V5a3 3 0 0 0-3-3Z"></path><path d="M19 10v2a7 7 0 0 1-14 0v-2"></path><line x1="12" x2="12" y1="19" y2="22"></line></svg>
+        </div>
+        <h3 className="fw-bold mb-3 text-white">Ready to practice your pitch?</h3>
+        <p className="text-secondary mb-5 mx-auto fs-5" style={{ maxWidth: '580px', lineHeight: '1.6' }}>
+          We will analyze your resume context and generate 5 highly specific technical and behavioral questions to dynamically simulate a real interview.
         </p>
-        {error && <Alert variant="danger" className="mb-4 text-start">{error}</Alert>}
-        <Button size="lg" onClick={generateQuestions} disabled={loadingQuestions} variant="primary" className="fw-bold shadow-sm">
-          {loadingQuestions ? <><Spinner size="sm" className="me-2" animation="border" /> Generating Questions...</> : "Start Interview Simulator"}
+        {error && <Alert variant="danger" className="mb-4 text-start border-0 rounded-4 shadow-sm">{error}</Alert>}
+        <Button size="lg" onClick={generateQuestions} disabled={loadingQuestions} variant="primary" className="fw-bold py-3 px-5 shadow-sm rounded-pill pulse-glow text-uppercase" style={{ letterSpacing: '1px', fontSize: '0.9rem' }}>
+          {loadingQuestions ? (
+            <><Spinner size="sm" className="me-3" animation="border" /> Generating Interview Protocol...</>
+          ) : (
+            "Start Interactive Simulator"
+          )}
         </Button>
       </div>
     );
@@ -174,76 +179,76 @@ export default function InterviewSimulator({ resumeText }: InterviewSimulatorPro
   const progress = Math.round(((currentIndex) / questions.length) * 100);
 
   return (
-    <div className="fade-in pt-3">
+    <div className="fade-in pt-4">
       <div className="d-flex justify-content-between align-items-center mb-4">
         <div className="d-flex align-items-center">
-          <div className="bg-primary rounded p-2 me-3 shadow-sm d-flex align-items-center justify-content-center" style={{ width: '40px', height: '40px' }}>
-            <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="white" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"><path d="M12 2a3 3 0 0 0-3 3v7a3 3 0 0 0 6 0V5a3 3 0 0 0-3-3Z"></path><path d="M19 10v2a7 7 0 0 1-14 0v-2"></path><line x1="12" x2="12" y1="19" y2="22"></line></svg>
+          <div className="bg-primary rounded p-3 me-3 shadow-md border border-primary border-opacity-25 flex-shrink-0 d-flex align-items-center justify-content-center pulse-glow" style={{ width: '48px', height: '48px', background: 'var(--accent-gradient)' }}>
+            <svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="white" strokeWidth="2.5" strokeLinecap="round" strokeLinejoin="round"><path d="M14 9V5a3 3 0 0 0-3-3l-4 9v11h11.28a2 2 0 0 0 2-1.7l1.38-9a2 2 0 0 0-2-2.3zM7 22H4a2 2 0 0 1-2-2v-7a2 2 0 0 1 2-2h3"></path></svg>
           </div>
           <div>
-            <h5 className="mb-0 text-white fw-bold">Live Simulator</h5>
-            <span className="text-success small fw-medium d-flex align-items-center">
-              <span className="bg-success rounded-circle me-1" style={{ width: '6px', height: '6px' }}></span> Online
+            <h5 className="mb-1 text-white fw-bold">Executive Interview Simulation</h5>
+            <span className="text-success small fw-bold d-flex align-items-center text-uppercase" style={{ letterSpacing: '1px', fontSize: '0.7rem' }}>
+              <span className="bg-success rounded-circle me-2 pulse-glow" style={{ width: '8px', height: '8px' }}></span> Active Session
             </span>
           </div>
         </div>
-        <Badge bg="dark" className="border border-secondary border-opacity-25 px-3 py-2 fw-medium text-secondary">
-          Question {currentIndex + 1} of {questions.length}
+        <Badge bg="dark" className="border border-secondary border-opacity-50 px-4 py-2 fw-bold text-secondary rounded-pill shadow-sm" style={{ letterSpacing: '1px', fontSize: '0.75rem' }}>
+          Q {currentIndex + 1} / {questions.length}
         </Badge>
       </div>
 
-      <ProgressBar now={progress} className="mb-5 bg-dark" style={{ height: '4px' }} variant="primary" />
+      <ProgressBar now={progress} className="mb-5 bg-dark rounded-pill border border-secondary border-opacity-25" style={{ height: '6px' }} variant="primary" />
 
-      {error && <Alert variant="danger" className="mb-4 text-start">{error}</Alert>}
+      {error && <Alert variant="danger" className="mb-4 text-start border-0 rounded-4 shadow-sm">{error}</Alert>}
 
-      <div className="chat-container d-flex flex-column gap-4 mb-5">
+      <div className="chat-container d-flex flex-column gap-4 mb-5 pb-5">
         {/* AI Question Bubble */}
-        <div className="d-flex align-items-start max-w-75">
-          <div className="bg-primary bg-opacity-10 rounded-circle p-2 me-3 flex-shrink-0 d-flex align-items-center justify-content-center" style={{ width: '36px', height: '36px' }}>
-            <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="var(--accent-blue)" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"><path d="M12 2a3 3 0 0 0-3 3v7a3 3 0 0 0 6 0V5a3 3 0 0 0-3-3Z"></path><path d="M19 10v2a7 7 0 0 1-14 0v-2"></path><line x1="12" x2="12" y1="19" y2="22"></line></svg>
+        <div className="d-flex align-items-start max-w-85 fade-in-delayed">
+          <div className="bg-dark rounded-circle p-2 me-3 flex-shrink-0 shadow-sm border border-secondary border-opacity-50 d-flex align-items-center justify-content-center" style={{ width: '42px', height: '42px' }}>
+            <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="var(--accent-blue)" strokeWidth="2.5" strokeLinecap="round" strokeLinejoin="round"><path d="M12 2a3 3 0 0 0-3 3v7a3 3 0 0 0 6 0V5a3 3 0 0 0-3-3Z"></path></svg>
           </div>
-          <div className="bg-card border border-secondary border-opacity-25 p-4 rounded-4 rounded-top-0 shadow-sm position-relative">
-            <p className="text-white mb-0 lh-lg font-monospace">{currentQ}</p>
-            <Button size="sm" variant="outline-secondary" className="position-absolute top-0 end-0 m-2 border-0" onClick={() => playAudio(currentQ)} title="Read Aloud">
-              <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"><polygon points="11 5 6 9 2 9 2 15 6 15 11 19 11 5"></polygon><path d="M19.07 4.93a10 10 0 0 1 0 14.14M15.54 8.46a5 5 0 0 1 0 7.07"></path></svg>
+          <div className="glass-panel p-4 shadow-sm position-relative" style={{ borderRadius: '4px 24px 24px 24px', border: '1px solid rgba(255,255,255,0.1)' }}>
+            <p className="text-white mb-0 lh-lg fs-5 fw-medium pe-4">{currentQ}</p>
+            <Button size="sm" variant="outline-secondary" className="position-absolute top-0 end-0 m-2 border-0 opacity-75 hover-opacity-100 bg-transparent text-secondary p-2 rounded-circle" onClick={() => playAudio(currentQ)} title="Read Aloud">
+              <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2.5" strokeLinecap="round" strokeLinejoin="round"><polygon points="11 5 6 9 2 9 2 15 6 15 11 19 11 5"></polygon><path d="M19.07 4.93a10 10 0 0 1 0 14.14M15.54 8.46a5 5 0 0 1 0 7.07"></path></svg>
             </Button>
           </div>
         </div>
 
         {/* User Answer Area OR Bubble */}
         {!evaluation ? (
-          <div className="d-flex align-items-start flex-row-reverse align-self-end w-100 mt-3 fade-in">
-            <div className="bg-secondary bg-opacity-10 rounded-circle p-2 ms-3 flex-shrink-0 d-flex align-items-center justify-content-center" style={{ width: '36px', height: '36px' }}>
-              <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="var(--text-primary)" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"><path d="M20 21v-2a4 4 0 0 0-4-4H8a4 4 0 0 0-4 4v2"></path><circle cx="12" cy="7" r="4"></circle></svg>
+          <div className="d-flex align-items-start flex-row-reverse align-self-end w-100 mt-4 fade-in-delayed" style={{ animationDelay: '0.2s' }}>
+            <div className="bg-primary rounded-circle p-2 ms-3 flex-shrink-0 shadow-sm d-flex align-items-center justify-content-center" style={{ width: '42px', height: '42px', background: 'var(--accent-gradient)' }}>
+              <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="white" strokeWidth="2.5" strokeLinecap="round" strokeLinejoin="round"><path d="M20 21v-2a4 4 0 0 0-4-4H8a4 4 0 0 0-4 4v2"></path><circle cx="12" cy="7" r="4"></circle></svg>
             </div>
-            <div className="w-100 max-w-75">
-              <Form.Group className="mb-3">
+            <div className="w-100 max-w-85">
+              <Form.Group className="mb-3 position-relative shadow-lg">
                 <Form.Control 
                   as="textarea" 
-                  rows={4} 
-                  placeholder="Draft your response here..."
+                  rows={5} 
+                  placeholder="Draft your response here, or use the microphone to dictate..."
                   value={currentAnswer}
                   onChange={(e) => setCurrentAnswer(e.target.value)}
                   disabled={evaluating}
-                  className="bg-dark border-secondary border-opacity-50 text-white shadow-none rounded-4 rounded-top-0 p-3"
-                  style={{ resize: 'none' }}
+                  className="bg-dark bg-opacity-75 border-secondary border-opacity-50 text-white shadow-none p-4 fs-6"
+                  style={{ resize: 'none', borderRadius: '24px 4px 24px 24px', letterSpacing: '0.3px', lineHeight: '1.6' }}
                 />
               </Form.Group>
-              <div className="d-flex justify-content-between align-items-center">
+              <div className="d-flex flex-wrap justify-content-between align-items-center gap-3">
                 <div>
                   {isRecording ? (
-                    <Button variant="danger" size="sm" className="fw-bold px-3 rounded-pill me-2 d-flex align-items-center shadow" onClick={stopRecording}>
-                      <Spinner animation="grow" size="sm" className="me-2" /> Stop Recording
+                    <Button variant="danger" className="fw-bold px-4 rounded-pill me-2 d-flex align-items-center shadow-lg pulse-glow" onClick={stopRecording}>
+                      <Spinner animation="grow" size="sm" className="me-3" /> Stop Recording
                     </Button>
                   ) : (
-                    <Button variant="outline-primary" size="sm" className="fw-bold px-3 rounded-pill me-2 d-flex align-items-center" onClick={startRecording} disabled={evaluating || isTranscribing}>
-                      <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round" className="me-2"><path d="M12 2a3 3 0 0 0-3 3v7a3 3 0 0 0 6 0V5a3 3 0 0 0-3-3Z"></path><path d="M19 10v2a7 7 0 0 1-14 0v-2"></path><line x1="12" x2="12" y1="19" y2="22"></line></svg>
-                      {isTranscribing ? "Transcribing..." : "Record Answer"}
+                    <Button variant="outline-primary" className="fw-bold px-4 rounded-pill me-2 d-flex align-items-center bg-dark bg-opacity-75 border-opacity-50" onClick={startRecording} disabled={evaluating || isTranscribing}>
+                      <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2.5" strokeLinecap="round" strokeLinejoin="round" className="me-2 text-primary"><path d="M12 2a3 3 0 0 0-3 3v7a3 3 0 0 0 6 0V5a3 3 0 0 0-3-3Z"></path><path d="M19 10v2a7 7 0 0 1-14 0v-2"></path><line x1="12" x2="12" y1="19" y2="22"></line></svg>
+                      {isTranscribing ? "Transcribing Audio..." : "Dictate Answer"}
                     </Button>
                   )}
                 </div>
-                <Button variant="primary" size="sm" className="fw-bold px-4 rounded-pill shadow-sm" onClick={submitAnswer} disabled={evaluating || isTranscribing || !currentAnswer.trim()}>
-                  {evaluating ? <><Spinner size="sm" className="me-2" animation="border" /> Thinking...</> : "Send Answer"}
+                <Button variant="primary" className="fw-bold px-5 py-2 rounded-pill shadow-lg text-uppercase tracking-widest" style={{ letterSpacing: '1px', fontSize: '0.8rem' }} onClick={submitAnswer} disabled={evaluating || isTranscribing || !currentAnswer.trim()}>
+                  {evaluating ? <><Spinner size="sm" className="me-3" animation="border" /> Analyzing Response...</> : "Submit Response ➔"}
                 </Button>
               </div>
             </div>
@@ -251,42 +256,49 @@ export default function InterviewSimulator({ resumeText }: InterviewSimulatorPro
         ) : (
           <>
             {/* User Submitted Answer Bubble */}
-            <div className="d-flex align-items-start flex-row-reverse align-self-end mt-3 fade-in">
-              <div className="bg-secondary bg-opacity-10 rounded-circle p-2 ms-3 flex-shrink-0 d-flex align-items-center justify-content-center" style={{ width: '36px', height: '36px' }}>
-                <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="var(--text-primary)" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"><path d="M20 21v-2a4 4 0 0 0-4-4H8a4 4 0 0 0-4 4v2"></path><circle cx="12" cy="7" r="4"></circle></svg>
+            <div className="d-flex align-items-start flex-row-reverse align-self-end mt-4 fade-in-delayed">
+              <div className="bg-primary rounded-circle p-2 ms-3 flex-shrink-0 shadow-sm d-flex align-items-center justify-content-center" style={{ width: '42px', height: '42px', background: 'var(--accent-gradient)' }}>
+                <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="white" strokeWidth="2.5" strokeLinecap="round" strokeLinejoin="round"><path d="M20 21v-2a4 4 0 0 0-4-4H8a4 4 0 0 0-4 4v2"></path><circle cx="12" cy="7" r="4"></circle></svg>
               </div>
-              <div className="bg-primary bg-opacity-10 border border-primary border-opacity-25 p-3 rounded-4 rounded-top-0 shadow-sm">
-                <p className="text-white mb-0 lh-lg">{currentAnswer}</p>
+              <div className="p-4 shadow-sm max-w-85" style={{ border: 'none', background: 'var(--accent-gradient)', borderRadius: '24px 4px 24px 24px' }}>
+                <p className="text-white mb-0 lh-lg fs-6 fw-medium">{currentAnswer}</p>
               </div>
             </div>
 
             {/* AI Feedback Bubble */}
-            <div className="d-flex align-items-start mt-3 fade-in">
-              <div className="bg-primary bg-opacity-10 rounded-circle p-2 me-3 flex-shrink-0 d-flex align-items-center justify-content-center" style={{ width: '36px', height: '36px' }}>
-                <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="var(--accent-blue)" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"><path d="M12 2a3 3 0 0 0-3 3v7a3 3 0 0 0 6 0V5a3 3 0 0 0-3-3Z"></path><path d="M19 10v2a7 7 0 0 1-14 0v-2"></path><line x1="12" x2="12" y1="19" y2="22"></line></svg>
+            <div className="d-flex align-items-start mt-5 fade-in-delayed" style={{ animationDelay: '0.3s' }}>
+              <div className="bg-dark rounded-circle p-2 me-3 flex-shrink-0 shadow-sm border border-secondary border-opacity-50 d-flex align-items-center justify-content-center" style={{ width: '42px', height: '42px' }}>
+                <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="var(--accent-blue)" strokeWidth="2.5" strokeLinecap="round" strokeLinejoin="round"><polygon points="13 2 3 14 12 14 11 22 21 10 12 10 13 2"></polygon></svg>
               </div>
-              <div className="w-100 max-w-75">
-                <div className="bg-card border border-secondary border-opacity-25 p-4 rounded-4 rounded-top-0 shadow-sm mb-3">
-                  <h6 className="text-white fw-bold d-flex align-items-center mb-3">
-                    <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="var(--text-secondary)" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round" className="me-2"><path d="M14 9V5a3 3 0 0 0-3-3l-4 9v11h11.28a2 2 0 0 0 2-1.7l1.38-9a2 2 0 0 0-2-2.3zM7 22H4a2 2 0 0 1-2-2v-7a2 2 0 0 1 2-2h3"></path></svg>
-                    Critique
+              <div className="w-100 max-w-85">
+                <div className="glass-panel p-4 p-md-5 shadow-lg mb-4" style={{ borderRadius: '4px 24px 24px 24px', border: '1px solid rgba(255,255,255,0.1)' }}>
+                  <h6 className="text-white fw-bold d-flex align-items-center mb-4 text-uppercase tracking-widest pb-3 border-bottom border-secondary border-opacity-25" style={{ letterSpacing: '2px', fontSize: '0.8rem' }}>
+                    <div className="bg-primary bg-opacity-25 p-2 rounded me-3 text-primary">
+                      <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2.5" strokeLinecap="round" strokeLinejoin="round"><path d="M14 9V5a3 3 0 0 0-3-3l-4 9v11h11.28a2 2 0 0 0 2-1.7l1.38-9a2 2 0 0 0-2-2.3zM7 22H4a2 2 0 0 1-2-2v-7a2 2 0 0 1 2-2h3"></path></svg>
+                    </div>
+                    Detailed Critique
                   </h6>
-                  <p className="text-secondary mb-0 lh-lg">{evaluation.critique}</p>
+                  <p className="text-secondary mb-0 lh-lg fs-6">{evaluation.critique}</p>
                 </div>
                 
-                <div className="bg-success bg-opacity-10 border border-success border-opacity-25 p-4 rounded-4 shadow-sm">
-                  <h6 className="text-success fw-bold d-flex align-items-center mb-3">
-                    <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round" className="me-2"><path d="M22 11.08V12a10 10 0 1 1-5.93-9.14"></path><polyline points="22 4 12 14.01 9 11.01"></polyline></svg>
-                    The Ideal Answer
+                <div className="p-4 p-md-5 shadow-lg position-relative overflow-hidden" style={{ background: 'rgba(16, 185, 129, 0.05)', border: '1px solid rgba(16, 185, 129, 0.2)', borderRadius: '24px' }}>
+                  <div className="position-absolute top-0 end-0 p-4 opacity-10">
+                    <svg width="60" height="60" viewBox="0 0 24 24" fill="none" stroke="var(--success)" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"><polyline points="22 4 12 14.01 9 11.01"></polyline></svg>
+                  </div>
+                  <h6 className="text-success fw-bold d-flex align-items-center mb-4 text-uppercase tracking-widest pb-3 border-bottom border-success border-opacity-25" style={{ letterSpacing: '2px', fontSize: '0.8rem' }}>
+                    <div className="bg-success bg-opacity-25 p-2 rounded me-3 text-success">
+                      <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2.5" strokeLinecap="round" strokeLinejoin="round"><path d="M22 11.08V12a10 10 0 1 1-5.93-9.14"></path><polyline points="22 4 12 14.01 9 11.01"></polyline></svg>
+                    </div>
+                    Ideal Answer Framework
                   </h6>
-                  <p className="text-white mb-0 lh-lg"><em>&quot;{evaluation.idealAnswer}&quot;</em></p>
+                  <p className="text-white mb-0 lh-lg fs-6 fst-italic position-relative z-index-1 pe-md-5">"{evaluation.idealAnswer}"</p>
                 </div>
 
-                <div className="d-flex justify-content-end mt-4">
+                <div className="d-flex justify-content-end mt-5 pt-3 border-top border-secondary border-opacity-25">
                   {currentIndex < questions.length - 1 ? (
-                    <Button variant="primary" size="sm" className="fw-bold px-4 rounded-pill" onClick={nextQuestion}>Next Question ➔</Button>
+                    <Button variant="primary" size="lg" className="fw-bold px-5 py-3 rounded-pill shadow-lg text-uppercase pulse-glow" style={{ letterSpacing: '2px', fontSize: '0.85rem' }} onClick={nextQuestion}>Next Question ➔</Button>
                   ) : (
-                    <Button variant="success" size="sm" className="fw-bold px-4 rounded-pill" onClick={() => setQuestions([])}>Finish Interview</Button>
+                    <Button variant="success" size="lg" className="fw-bold px-5 py-3 rounded-pill shadow-lg text-uppercase pulse-glow bg-success border-0" style={{ letterSpacing: '2px', fontSize: '0.85rem' }} onClick={() => setQuestions([])}>Finish Interview Sequence</Button>
                   )}
                 </div>
               </div>

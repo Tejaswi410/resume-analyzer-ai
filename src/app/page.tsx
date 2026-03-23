@@ -1,6 +1,6 @@
 "use client";
 
-import React, { useState } from "react";
+import React, { useState, useEffect } from "react";
 import { Container, Row, Col, Form, Button, Spinner, Alert, Card, Badge } from "react-bootstrap";
 import FileUploader from "./components/FileUploader";
 import AnalysisResults, { AnalysisData } from "./components/AnalysisResults";
@@ -13,18 +13,16 @@ export default function Home() {
   const [analysisError, setAnalysisError] = useState<string | null>(null);
   const [analysisData, setAnalysisData] = useState<AnalysisData | null>(null);
   const [activeTab, setActiveTab] = useState<string>("dashboard");
+  const [isSidebarOpen, setIsSidebarOpen] = useState(false);
 
   const handleAnalyze = async () => {
-    
     setAnalyzing(true);
     setAnalysisError(null);
 
     try {
       const response = await fetch("/api/analyze", {
         method: "POST",
-        headers: {
-          "Content-Type": "application/json"
-        },
+        headers: { "Content-Type": "application/json" },
         body: JSON.stringify({ text: parsedText, jobDescription })
       });
 
@@ -43,38 +41,47 @@ export default function Home() {
   };
 
   return (
-    <div className="d-flex">
+    <div className="d-flex overflow-hidden">
+      {/* Sidebar Overlay for Mobile */}
+      <div 
+        className={`sidebar-overlay ${isSidebarOpen ? 'active' : ''}`} 
+        onClick={() => setIsSidebarOpen(false)}
+      ></div>
+
       {/* Sidebar Navigation */}
-      <div className="sidebar shadow-sm">
-        <div className="d-flex align-items-center mb-5 px-4 mt-2">
-          <div className="bg-primary rounded p-2 me-2 shadow-sm d-flex align-items-center justify-content-center" style={{ width: '32px', height: '32px' }}>
-            <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="white" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">
+      <div className={`sidebar ${!isSidebarOpen ? 'collapsed' : 'open'}`}>
+        <div className="d-flex align-items-center mb-5 px-4 mt-4">
+          <div className="btn-primary rounded p-2 me-3 d-flex align-items-center justify-content-center shadow" style={{ width: '36px', height: '36px' }}>
+            <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="white" strokeWidth="2.5" strokeLinecap="round" strokeLinejoin="round">
               <rect x="2" y="3" width="20" height="14" rx="2" ry="2"></rect>
               <line x1="8" y1="21" x2="16" y2="21"></line>
               <line x1="12" y1="17" x2="12" y2="21"></line>
             </svg>
           </div>
-          <h5 className="fw-bold mb-0 text-white" style={{ fontSize: '1.1rem' }}>AnalyzeMyResume<span className="text-primary">.ai</span></h5>
+          <h5 className="fw-bold mb-0 text-white" style={{ fontSize: '1.2rem', letterSpacing: '-0.5px' }}>
+            Analyze<span className="text-gradient">MyResume</span>
+          </h5>
         </div>
 
-        <div className="px-3">
-          <p className="text-uppercase text-muted small fw-bold mb-2 px-2" style={{ letterSpacing: '0.5px' }}>Overview</p>
-          <a href="#" className={`sidebar-link rounded mb-1 ${activeTab === 'dashboard' ? 'active' : ''}`} onClick={(e) => { e.preventDefault(); setActiveTab('dashboard'); }}>
-            <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round" className="me-3"><rect x="3" y="3" width="7" height="7"></rect><rect x="14" y="3" width="7" height="7"></rect><rect x="14" y="14" width="7" height="7"></rect><rect x="3" y="14" width="7" height="7"></rect></svg>
+        <div className="flex-grow-1 overflow-auto">
+          <p className="text-uppercase small fw-bold mb-2 px-4" style={{ letterSpacing: '1px', color: '#6b7280', fontSize: '0.75rem' }}>Overview</p>
+          <a href="#" className={`sidebar-link ${activeTab === 'dashboard' ? 'active' : ''}`} onClick={(e) => { e.preventDefault(); setActiveTab('dashboard'); window.innerWidth < 992 && setIsSidebarOpen(false); }}>
+            <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round" className="me-3"><rect x="3" y="3" width="7" height="7" rx="1"></rect><rect x="14" y="3" width="7" height="7" rx="1"></rect><rect x="14" y="14" width="7" height="7" rx="1"></rect><rect x="3" y="14" width="7" height="7" rx="1"></rect></svg>
             Dashboard
           </a>
-          <a href="#" className={`sidebar-link rounded mb-1 ${activeTab === 'simulator' ? 'active' : ''}`} onClick={(e) => { e.preventDefault(); setActiveTab('simulator'); }}>
+          <a href="#" className={`sidebar-link ${activeTab === 'simulator' ? 'active' : ''}`} onClick={(e) => { e.preventDefault(); setActiveTab('simulator'); window.innerWidth < 992 && setIsSidebarOpen(false); }}>
             <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round" className="me-3"><path d="M21 15a2 2 0 0 1-2 2H7l-4 4V5a2 2 0 0 1 2-2h14a2 2 0 0 1 2 2z"></path></svg>
             Interview Simulator
           </a>
           
           <div className="mt-5">
-            <p className="text-uppercase text-muted small fw-bold mb-2 px-2" style={{ letterSpacing: '0.5px' }}>Data</p>
-            <a href="#" className={`sidebar-link rounded mb-1`} onClick={(e) => { 
+            <p className="text-uppercase small fw-bold mb-2 px-4" style={{ letterSpacing: '1px', color: '#6b7280', fontSize: '0.75rem' }}>Data</p>
+            <a href="#" className={`sidebar-link`} onClick={(e) => { 
                 e.preventDefault(); 
                 setParsedText("");
                 setAnalysisData(null);
                 setActiveTab('dashboard');
+                window.innerWidth < 992 && setIsSidebarOpen(false);
             }}>
               <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round" className="me-3"><path d="M14 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V8z"></path><polyline points="14 2 14 8 20 8"></polyline><line x1="12" y1="18" x2="12" y2="12"></line><line x1="9" y1="15" x2="15" y2="15"></line></svg>
               Upload New Resume
@@ -84,47 +91,60 @@ export default function Home() {
       </div>
 
       {/* Main Content Area */}
-      <div className="main-content flex-grow-1 bg-dark" style={{ minHeight: '100vh', paddingBottom: '100px' }}>
-        <Container fluid className="px-md-4 pt-4">
-          
+      <div className={`main-content flex-grow-1 ${!isSidebarOpen ? 'expanded' : ''}`}>
+        {/* Top Navigation Bar with Hamburger */}
+        <div className="top-nav shadow-sm mb-4">
+          <button className="menu-toggle me-3 text-white" onClick={() => setIsSidebarOpen(!isSidebarOpen)} aria-label="Toggle Navigation">
+            <svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"><line x1="3" y1="12" x2="21" y2="12"></line><line x1="3" y1="6" x2="21" y2="6"></line><line x1="3" y1="18" x2="21" y2="18"></line></svg>
+          </button>
+          <span className="fw-medium text-secondary" style={{ fontSize: '0.9rem' }}>
+            {parsedText ? (activeTab === 'dashboard' ? 'Dashboard / Analysis' : 'Dashboard / Simulator') : 'Welcome'}
+          </span>
+        </div>
+
+        <Container fluid className="px-md-5 pb-5 fade-in">
           {!parsedText ? (
-            <Row className="justify-content-center align-items-center" style={{ minHeight: '80vh' }}>
+            <Row className="justify-content-center align-items-center" style={{ minHeight: '75vh' }}>
               <Col md={10} lg={8} xl={6}>
-                <div className="text-center mb-5">
-                  <div className="d-inline-block bg-primary bg-opacity-10 rounded-pill px-3 py-1 mb-3">
-                    <span className="text-primary fw-bold small tracking-wide">AI-POWERED INSIGHTS</span>
+                <div className="text-center mb-5 fade-in-delayed">
+                  <div className="d-inline-block badge bg-primary px-3 py-2 mb-4 shadow-sm" style={{ borderRadius: '20px' }}>
+                    <span className="fw-bold tracking-wide" style={{ letterSpacing: '1px', fontSize: '0.7rem' }}>✨ AI-POWERED INSIGHTS</span>
                   </div>
-                  <h1 className="fw-bold mb-3 text-white" style={{ fontSize: '2.5rem', letterSpacing: '-0.5px' }}>Upgrade Your Resume</h1>
-                  <p className="text-secondary mb-4 mx-auto fs-5" style={{ maxWidth: "500px", lineHeight: '1.6' }}>
+                  <h1 className="fw-bold mb-3 text-white" style={{ fontSize: '3rem', letterSpacing: '-1px' }}>
+                    Upgrade Your <span className="text-gradient">Resume</span>
+                  </h1>
+                  <p className="text-secondary mb-5 mx-auto fs-5" style={{ maxWidth: "540px", lineHeight: '1.6' }}>
                     Drag and drop your resume to receive professional bullet point rewrites, skill gap tracking, and mock interviews.
                   </p>
                 </div>
-                <div className="mx-auto" style={{ maxWidth: "600px" }}>
+                <div className="mx-auto fade-in-delayed" style={{ maxWidth: "600px", animationDelay: '0.2s' }}>
                   <FileUploader onParsed={setParsedText} />
                 </div>
               </Col>
             </Row>
           ) : (
             <div className="fade-in">
-              <div className="d-flex justify-content-between align-items-end mb-4 pb-3 border-bottom border-dark border-opacity-50">
+              <div className="d-flex flex-column flex-md-row justify-content-between align-items-md-end mb-4 pb-4 border-bottom border-secondary border-opacity-25">
                 <div>
-                  <h2 className="fw-bold mb-1 text-white" style={{ letterSpacing: '-0.5px' }}>
+                  <h2 className="fw-bold mb-2 text-white" style={{ letterSpacing: '-0.5px' }}>
                     {activeTab === 'dashboard' ? 'Resume Analysis Dashboard' : 'Interview Simulator'}
                   </h2>
-                  <p className="text-muted mb-0">Professional insights generated by Llama 3.3</p>
+                  <p className="text-secondary mb-0">Professional insights generated by state-of-the-art LLMs</p>
                 </div>
               </div>
 
               {activeTab === 'dashboard' && (
-                <Row>
+                <Row className="g-4">
                   <Col xl={4} className="mb-4">
-                    <Card className="shadow-sm mb-4 border-0">
+                    <Card className="glass-panel mb-4 border-0">
                       <Card.Body className="p-4">
                         <div className="d-flex align-items-center mb-3">
-                          <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="var(--accent-blue)" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round" className="me-2"><circle cx="12" cy="12" r="10"></circle><line x1="12" y1="16" x2="12" y2="12"></line><line x1="12" y1="8" x2="12.01" y2="8"></line></svg>
+                          <div className="bg-primary bg-opacity-10 p-2 rounded me-3 text-primary">
+                            <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"><circle cx="12" cy="12" r="10"></circle><line x1="12" y1="16" x2="12" y2="12"></line><line x1="12" y1="8" x2="12.01" y2="8"></line></svg>
+                          </div>
                           <h6 className="fw-bold mb-0 text-white">Target Job Profile</h6>
                         </div>
-                        <p className="text-secondary small mb-3">
+                        <p className="text-secondary small mb-4" style={{ lineHeight: '1.6' }}>
                           Paste the JD you are applying to. Our LLM will heavily optimize your bullet points and identify exact skill gaps against this profile.
                         </p>
                         <Form.Control 
@@ -133,50 +153,53 @@ export default function Home() {
                           placeholder="e.g., Seeking a Senior Frontend Engineer with Next.js experience..."
                           value={jobDescription}
                           onChange={(e) => setJobDescription(e.target.value)}
-                          className="mb-3"
+                          className="mb-4 shadow-none"
                           style={{ resize: 'none' }}
                         />
                         
                         {analysisError && (
-                          <Alert variant="danger" className="mb-3 border-0 bg-danger bg-opacity-10 text-danger py-2 px-3 small">
-                            <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" className="me-2"><circle cx="12" cy="12" r="10"></circle><line x1="12" y1="8" x2="12" y2="12"></line><line x1="12" y1="16" x2="12.01" y2="16"></line></svg>
+                          <Alert variant="danger" className="mb-3 border-0 py-2 px-3 small d-flex align-items-center rounded-3">
+                            <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" className="me-2 flex-shrink-0"><circle cx="12" cy="12" r="10"></circle><line x1="12" y1="8" x2="12" y2="12"></line><line x1="12" y1="16" x2="12.01" y2="16"></line></svg>
                             {analysisError}
                           </Alert>
                         )}
                         
                         <Button 
                           variant="primary" 
-                          className="w-100 fw-bold py-2 shadow-sm"
+                          className="w-100 py-3 d-flex align-items-center justify-content-center pulse-glow"
                           onClick={handleAnalyze} 
                           disabled={analyzing}
                         >
                           {analyzing ? (
-                            <><Spinner as="span" animation="border" size="sm" className="me-2 text-white" /> Optimizing...</>
+                            <><Spinner as="span" animation="border" size="sm" className="me-2 text-white" /> Analyzing Profile...</>
                           ) : (
-                            "Scan Context & Generate Insights"
+                            <>
+                              <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round" className="me-2"><polygon points="13 2 3 14 12 14 11 22 21 10 12 10 13 2"></polygon></svg>
+                              Generate Insights
+                            </>
                           )}
                         </Button>
                       </Card.Body>
                     </Card>
 
                     {analysisData && (
-                      <Card className="shadow-sm border-0 bg-transparent">
-                        <Card.Body className="p-0">
-                          <h6 className="fw-bold text-white mb-3 text-uppercase small" style={{ letterSpacing: '0.5px' }}>Quick Stats</h6>
-                          <div className="d-flex flex-column gap-2 border border-secondary border-opacity-25 rounded p-3 bg-card">
-                            <div className="d-flex justify-content-between align-items-center">
-                              <span className="text-secondary small">Total Skills Found</span>
-                              <Badge bg="secondary" className="px-2 py-1 bg-opacity-25 text-white border-0">{analysisData.skills.length}</Badge>
+                      <Card className="glass-panel border-0">
+                        <Card.Body className="p-4">
+                          <h6 className="fw-bold text-secondary mb-3 text-uppercase small" style={{ letterSpacing: '1px' }}>Quick Stats</h6>
+                          <div className="d-flex flex-column gap-3">
+                            <div className="d-flex justify-content-between align-items-center bg-dark bg-opacity-50 p-3 rounded border border-secondary border-opacity-25">
+                              <span className="text-secondary small fw-medium">Total Skills Found</span>
+                              <Badge bg="secondary" className="px-3 py-2 border-0 rounded-pill">{analysisData.skills.length}</Badge>
                             </div>
-                            <div className="d-flex justify-content-between align-items-center">
-                              <span className="text-secondary small">Missing Core Skills</span>
-                              <Badge bg={analysisData.missingSkills.length > 0 ? "warning" : "success"} className="px-2 py-1 bg-opacity-25 border-0">
+                            <div className="d-flex justify-content-between align-items-center bg-dark bg-opacity-50 p-3 rounded border border-secondary border-opacity-25">
+                              <span className="text-secondary small fw-medium">Missing Core Skills</span>
+                              <Badge bg={analysisData.missingSkills.length > 0 ? "warning" : "success"} className="px-3 py-2 border-0 rounded-pill">
                                 {analysisData.missingSkills.length}
                               </Badge>
                             </div>
-                            <div className="d-flex justify-content-between align-items-center">
-                              <span className="text-secondary small">Bullets Improved</span>
-                              <Badge bg="primary" className="px-2 py-1 bg-opacity-25 border-0 text-white">{analysisData.experienceImprovements.length}</Badge>
+                            <div className="d-flex justify-content-between align-items-center bg-dark bg-opacity-50 p-3 rounded border border-secondary border-opacity-25">
+                              <span className="text-secondary small fw-medium">Bullets Improved</span>
+                              <Badge bg="primary" className="px-3 py-2 border-0 rounded-pill text-white">{analysisData.experienceImprovements.length}</Badge>
                             </div>
                           </div>
                         </Card.Body>
@@ -186,23 +209,23 @@ export default function Home() {
 
                   <Col xl={8}>
                     {analyzing ? (
-                      <div className="d-flex flex-column gap-4">
-                        <div className="skeleton w-100" style={{ height: '180px' }}></div>
-                        <div className="row">
-                          <div className="col-6"><div className="skeleton w-100" style={{ height: '120px' }}></div></div>
-                          <div className="col-6"><div className="skeleton w-100" style={{ height: '120px' }}></div></div>
+                      <div className="d-flex flex-column gap-4 fade-in">
+                        <div className="skeleton w-100" style={{ height: '220px', borderRadius: '12px' }}></div>
+                        <div className="row g-4">
+                          <div className="col-12 col-md-6"><div className="skeleton w-100" style={{ height: '180px', borderRadius: '12px' }}></div></div>
+                          <div className="col-12 col-md-6"><div className="skeleton w-100" style={{ height: '180px', borderRadius: '12px' }}></div></div>
                         </div>
-                        <div className="skeleton w-100" style={{ height: '300px' }}></div>
+                        <div className="skeleton w-100" style={{ height: '400px', borderRadius: '12px' }}></div>
                       </div>
                     ) : analysisData ? (
                       <AnalysisResults data={analysisData} />
                     ) : (
-                      <div className="h-100 d-flex flex-column align-items-center justify-content-center text-center p-5 border border-secondary border-opacity-25 border-dashed rounded" style={{ borderStyle: 'dashed' }}>
-                        <div className="bg-dark rounded-circle p-3 mb-3 border border-secondary border-opacity-25">
-                          <svg width="32" height="32" viewBox="0 0 24 24" fill="none" stroke="var(--text-secondary)" strokeWidth="1.5" strokeLinecap="round" strokeLinejoin="round"><path d="M14 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V8z"></path><polyline points="14 2 14 8 20 8"></polyline><line x1="16" y1="13" x2="8" y2="13"></line><line x1="16" y1="17" x2="8" y2="17"></line><polyline points="10 9 9 9 8 9"></polyline></svg>
+                      <div className="h-100 d-flex flex-column align-items-center justify-content-center text-center p-5 border border-secondary border-opacity-25 border-dashed rounded-4" style={{ borderStyle: 'dashed', backgroundColor: 'rgba(20,20,25,0.4)', minHeight: '500px' }}>
+                        <div className="bg-dark rounded-circle p-4 mb-4 border border-secondary border-opacity-25 shadow-sm">
+                          <svg width="40" height="40" viewBox="0 0 24 24" fill="none" stroke="currentColor" className="text-primary opacity-75" strokeWidth="1.5" strokeLinecap="round" strokeLinejoin="round"><path d="M14 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V8z"></path><polyline points="14 2 14 8 20 8"></polyline><line x1="16" y1="13" x2="8" y2="13"></line><line x1="16" y1="17" x2="8" y2="17"></line><polyline points="10 9 9 9 8 9"></polyline></svg>
                         </div>
-                        <h5 className="text-white fw-bold mb-2">No Analysis Data Yet</h5>
-                        <p className="text-muted small mb-0 max-w-sm mx-auto" style={{ maxWidth: '300px' }}>Enter an optional job description on the left and click Generate to see your interactive resume breakdown.</p>
+                        <h4 className="text-white fw-bold mb-3">No Output Generated</h4>
+                        <p className="text-secondary mb-0 mx-auto" style={{ maxWidth: '380px', lineHeight: '1.6' }}>Enter an optional job description on the left and click <strong className="text-primary">Generate Insights</strong> to see your interactive resume breakdown.</p>
                       </div>
                     )}
                   </Col>
@@ -210,7 +233,7 @@ export default function Home() {
               )}
 
               {activeTab === 'simulator' && (
-                <Row className="justify-content-center">
+                <Row className="justify-content-center fade-in">
                   <Col md={12} lg={10} xl={8}>
                     <InterviewSimulator resumeText={parsedText} />
                   </Col>

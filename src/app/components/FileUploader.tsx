@@ -11,7 +11,6 @@ export default function FileUploader({ onParsed }: FileUploaderProps) {
   const [file, setFile] = useState<File | null>(null);
   const [loading, setLoading] = useState(false);
   const [error, setError] = useState<string | null>(null);
-
   const [isHovered, setIsHovered] = useState(false);
 
   const handleFileChange = (e: React.ChangeEvent<HTMLInputElement>) => {
@@ -82,25 +81,39 @@ export default function FileUploader({ onParsed }: FileUploaderProps) {
       <Card.Body className="p-0">
         <Form onSubmit={handleUpload}>
           <div 
-            className={`dropzone mb-4 ${isHovered ? 'active' : ''}`}
+            className={`dropzone mb-4 ${isHovered || file ? 'active' : ''}`}
             onDrop={handleDrop}
             onDragOver={handleDragOver}
             onDragLeave={handleDragLeave}
             onClick={() => document.getElementById('fileUploadInput')?.click()}
           >
-            <div className="mb-3">
-              <svg width="48" height="48" viewBox="0 0 24 24" fill="none" stroke="var(--text-secondary)" strokeWidth="1.5" strokeLinecap="round" strokeLinejoin="round">
-                <path d="M21 15v4a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2v-4"></path>
-                <polyline points="17 8 12 3 7 8"></polyline>
-                <line x1="12" y1="3" x2="12" y2="15"></line>
-              </svg>
+            <div className={`mb-3 transition-transform ${isHovered || file ? 'scale-110' : ''}`} style={{ transition: 'transform 0.3s ease' }}>
+              <div className="d-inline-flex bg-primary bg-opacity-10 p-4 rounded-circle mb-2">
+                {file ? (
+                  <svg width="40" height="40" viewBox="0 0 24 24" fill="none" stroke="var(--accent-blue)" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">
+                    <path d="M14 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V8z"></path>
+                    <polyline points="14 2 14 8 20 8"></polyline>
+                    <line x1="16" y1="13" x2="8" y2="13"></line>
+                    <line x1="16" y1="17" x2="8" y2="17"></line>
+                    <polyline points="10 9 9 9 8 9"></polyline>
+                  </svg>
+                ) : (
+                  <svg width="40" height="40" viewBox="0 0 24 24" fill="none" stroke="var(--accent-blue)" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">
+                    <path d="M21 15v4a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2v-4"></path>
+                    <polyline points="17 8 12 3 7 8"></polyline>
+                    <line x1="12" y1="3" x2="12" y2="15"></line>
+                  </svg>
+                )}
+              </div>
             </div>
-            <h5 className="fw-bold text-light mb-2">
+            
+            <h5 className={`fw-bold mb-2 tracking-tight ${file ? 'text-primary' : 'text-white'}`}>
               {file ? file.name : "Click or drag resume here"}
             </h5>
-            <p className="text-muted small mb-0">
-              Supported formats: PDF, DOCX, TXT.
+            <p className="text-secondary small mb-0 px-4" style={{ lineHeight: '1.6' }}>
+              {file ? "File ready for analysis." : "Upload your resume in PDF, DOCX, or TXT format. We'll automatically extract the text."}
             </p>
+            
             <Form.Control 
               id="fileUploadInput"
               type="file" 
@@ -110,15 +123,31 @@ export default function FileUploader({ onParsed }: FileUploaderProps) {
             />
           </div>
           
-          {error && <Alert variant="danger" className="border-0 bg-danger bg-opacity-10 text-danger">{error}</Alert>}
+          {error && (
+            <Alert variant="danger" className="border-0 py-3 px-4 d-flex align-items-center rounded-4 shadow-sm">
+              <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round" className="me-3 flex-shrink-0"><circle cx="12" cy="12" r="10"></circle><line x1="12" y1="8" x2="12" y2="12"></line><line x1="12" y1="16" x2="12.01" y2="16"></line></svg>
+              <span>{error}</span>
+            </Alert>
+          )}
           
-          <Button variant="primary" size="lg" className="w-100 fw-bold" type="submit" disabled={!file || loading}>
+          <Button 
+            variant="primary" 
+            size="lg" 
+            className={`w-100 fw-bold py-3 px-4 rounded-3 d-flex justify-content-center align-items-center mt-2 ${file && !loading ? 'pulse-glow' : ''}`} 
+            type="submit" 
+            disabled={!file || loading}
+          >
             {loading ? (
-              <div className="d-flex justify-content-center align-items-center">
-                <Spinner as="span" animation="border" size="sm" role="status" aria-hidden="true" className="me-2 text-white" />
-                <span>Processing Document...</span>
-              </div>
-            ) : "Analyze Resume"}
+              <>
+                <Spinner as="span" animation="border" size="sm" role="status" aria-hidden="true" className="me-3 text-white" />
+                <span>Processing Document Details...</span>
+              </>
+            ) : (
+              <>
+                <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2.5" strokeLinecap="round" strokeLinejoin="round" className="me-2"><polygon points="13 2 3 14 12 14 11 22 21 10 12 10 13 2"></polygon></svg>
+                Analyze Resume Instantly
+              </>
+            )}
           </Button>
         </Form>
       </Card.Body>
